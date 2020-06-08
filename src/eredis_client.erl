@@ -25,7 +25,7 @@
 -include("eredis.hrl").
 
 %% API
--export([start_link/7, stop/1, select_database/2]).
+-export([start_link/6, start_link2/7, stop/1, select_database/2]).
 
 -export([do_sync_command/2]).
 
@@ -50,15 +50,27 @@
 %% API
 %%
 
--spec start_link(ProcName :: atom(),
-                 Host::list(),
+-spec start_link(Host::list(),
                  Port::integer(),
                  Database::integer() | undefined,
                  Password::string(),
                  ReconnectSleep::reconnect_sleep(),
                  ConnectTimeout::integer() | undefined) ->
                         {ok, Pid::pid()} | {error, Reason::term()}.
-start_link(ProcName, Host, Port, Database, Password, ReconnectSleep, ConnectTimeout) ->
+start_link(Host, Port, Database, Password, ReconnectSleep, ConnectTimeout) ->
+    gen_server:start_link(?MODULE, [Host, Port, Database, Password,
+                ReconnectSleep, ConnectTimeout], []).
+
+
+-spec start_link2(ProcName :: atom(),
+    Host::list(),
+    Port::integer(),
+    Database::integer() | undefined,
+    Password::string(),
+    ReconnectSleep::reconnect_sleep(),
+    ConnectTimeout::integer() | undefined) ->
+    {ok, Pid::pid()} | {error, Reason::term()}.
+start_link2(ProcName, Host, Port, Database, Password, ReconnectSleep, ConnectTimeout) ->
     case ProcName of
         none ->
             gen_server:start_link(?MODULE, [Host, Port, Database, Password,
